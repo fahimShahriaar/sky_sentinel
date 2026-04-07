@@ -28,3 +28,12 @@ class ToggleRainAlert extends SettingsEvent {
   @override
   List<Object?> get props => [enabled];
 }
+
+class ToggleTemperatureUnit extends SettingsEvent {
+  final bool isCelsius;
+
+  const ToggleTemperatureUnit({required this.isCelsius});
+
+  @override
+  List<Object?> get props => [isCelsius];
+}

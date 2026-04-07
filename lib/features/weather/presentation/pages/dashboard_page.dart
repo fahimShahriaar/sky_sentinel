@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/utils/weather_icon_helper.dart';
+import '../../../../core/utils/temperature_utils.dart';
 import '../../../settings/presentation/bloc/settings_bloc.dart';
 import '../../../settings/presentation/bloc/settings_state.dart';
 import '../bloc/weather_bloc.dart';
@@ -182,11 +183,12 @@ class DashboardPage extends StatelessWidget {
           builder: (context, settingsState) {
             if (settingsState is SettingsLoaded) {
               final settings = settingsState.settings;
+              final isCelsius = settings.isCelsius;
               final isOverTemp = weather.temperature > settings.temperatureThreshold;
               final isRaining = weather.isRaining && settings.rainAlertEnabled;
 
               if (isOverTemp || isRaining) {
-                return AlertBanner(isTemperatureAlert: isOverTemp, isRainAlert: isRaining, temperature: weather.temperature, threshold: settings.temperatureThreshold, rainVolume: weather.rainVolume);
+                return AlertBanner(isTemperatureAlert: isOverTemp, isRainAlert: isRaining, temperature: weather.temperature, threshold: settings.temperatureThreshold, rainVolume: weather.rainVolume, isCelsius: isCelsius);
               }
             }
             return const SizedBox.shrink();
@@ -216,45 +218,50 @@ class DashboardPage extends StatelessWidget {
         const SizedBox(height: 16),
 
         // Main temperature display
-        Center(
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
+        BlocBuilder<SettingsBloc, SettingsState>(
+          builder: (context, settingsState) {
+            final isCelsius = settingsState is SettingsLoaded ? settingsState.settings.isCelsius : true;
+            return Center(
+              child: Column(
                 children: [
-                  Text(
-                    '${weather.temperature.toStringAsFixed(0)}°',
-                    style: TextStyle(fontSize: 96, fontWeight: FontWeight.w200, color: AppColors.textPrimary, height: 1),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${TemperatureUtils.formatTemp(weather.temperature, isCelsius)}°',
+                        style: TextStyle(fontSize: 96, fontWeight: FontWeight.w200, color: AppColors.textPrimary, height: 1),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: Text(
+                          TemperatureUtils.unitLabel(isCelsius),
+                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w300, color: AppColors.accentCyan),
+                        ),
+                      ),
+                    ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: Text(
-                      'F',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w300, color: AppColors.accentCyan),
-                    ),
+                  const SizedBox(height: 4),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(WeatherIconHelper.getIcon(weather.weatherId), color: WeatherIconHelper.getIconColor(weather.weatherId), size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        weather.conditionDescription[0].toUpperCase() + weather.conditionDescription.substring(1),
+                        style: const TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.w400),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    updatedText,
+                    style: const TextStyle(color: AppColors.textTertiary, fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 1.5),
                   ),
                 ],
               ),
-              const SizedBox(height: 4),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(WeatherIconHelper.getIcon(weather.weatherId), color: WeatherIconHelper.getIconColor(weather.weatherId), size: 20),
-                  const SizedBox(width: 8),
-                  Text(
-                    weather.conditionDescription[0].toUpperCase() + weather.conditionDescription.substring(1),
-                    style: const TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.w400),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Text(
-                updatedText,
-                style: const TextStyle(color: AppColors.textTertiary, fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 1.5),
-              ),
-            ],
-          ),
+            );
+          },
         ),
 
         const SizedBox(height: 32),
@@ -270,15 +277,26 @@ class DashboardPage extends StatelessWidget {
           highlighted: false,
         ),
         const SizedBox(height: 12),
-        _buildAnimatedCard(
-          child: WeatherInfoCard(icon: Icons.thermostat, iconColor: _getUvColor(weather.temperature), label: 'Feels Like', value: '${weather.feelsLike.toStringAsFixed(0)}°F', suffix: _getFeelsLikeLabel(weather.feelsLike), highlighted: alertHighlight == AppConstants.alertPayloadTemp),
-          highlighted: alertHighlight == AppConstants.alertPayloadTemp,
+        BlocBuilder<SettingsBloc, SettingsState>(
+          builder: (context, settingsState) {
+            final isCelsius = settingsState is SettingsLoaded ? settingsState.settings.isCelsius : true;
+            return _buildAnimatedCard(
+              child: WeatherInfoCard(icon: Icons.thermostat, iconColor: _getUvColor(weather.temperature), label: 'Feels Like', value: TemperatureUtils.formatTempWithUnit(weather.feelsLike, isCelsius), suffix: _getFeelsLikeLabel(weather.feelsLike), highlighted: alertHighlight == AppConstants.alertPayloadTemp),
+              highlighted: alertHighlight == AppConstants.alertPayloadTemp,
+            );
+          },
         ),
 
         const SizedBox(height: 24),
 
         // Hourly Outlook
-        if (forecast != null && forecast.days.isNotEmpty) HourlyOutlookSection(hours: forecast.days.first.hours),
+        if (forecast != null && forecast.days.isNotEmpty)
+          BlocBuilder<SettingsBloc, SettingsState>(
+            builder: (context, settingsState) {
+              final isCelsius = settingsState is SettingsLoaded ? settingsState.settings.isCelsius : true;
+              return HourlyOutlookSection(hours: forecast.days.first.hours, isCelsius: isCelsius);
+            },
+          ),
 
         const SizedBox(height: 24),
       ],

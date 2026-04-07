@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/weather_icon_helper.dart';
+import '../../../../core/utils/temperature_utils.dart';
 import '../../data/models/forecast_model.dart';
 
 class HourlyOutlookSection extends StatelessWidget {
   final List<ForecastHour> hours;
+  final bool isCelsius;
 
-  const HourlyOutlookSection({super.key, required this.hours});
+  const HourlyOutlookSection({super.key, required this.hours, required this.isCelsius});
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +65,7 @@ class HourlyOutlookSection extends StatelessWidget {
                       Icon(WeatherIconHelper.getIcon(hour.weatherId), color: WeatherIconHelper.getIconColor(hour.weatherId), size: 24),
                       const SizedBox(height: 12),
                       Text(
-                        '${hour.temperature.toStringAsFixed(0)}°',
+                        '${TemperatureUtils.formatTemp(hour.temperature, isCelsius)}°',
                         style: const TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w600),
                       ),
                     ],

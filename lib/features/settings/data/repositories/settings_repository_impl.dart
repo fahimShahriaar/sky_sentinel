@@ -21,4 +21,9 @@ class SettingsRepositoryImpl implements SettingsRepository {
   Future<void> saveRainAlertEnabled(bool enabled) async {
     await localDataSource.saveRainAlertEnabled(enabled);
   }
+
+  @override
+  Future<void> saveTemperatureUnit(bool isCelsius) async {
+    await localDataSource.saveTemperatureUnit(isCelsius);
+  }
 }

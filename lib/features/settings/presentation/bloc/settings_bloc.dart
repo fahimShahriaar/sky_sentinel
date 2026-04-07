@@ -11,6 +11,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<LoadSettings>(_onLoadSettings);
     on<UpdateTemperatureThreshold>(_onUpdateTemperatureThreshold);
     on<ToggleRainAlert>(_onToggleRainAlert);
+    on<ToggleTemperatureUnit>(_onToggleTemperatureUnit);
   }
 
   void _onLoadSettings(LoadSettings event, Emitter<SettingsState> emit) {
@@ -27,6 +28,12 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
 
   Future<void> _onToggleRainAlert(ToggleRainAlert event, Emitter<SettingsState> emit) async {
     await repository.saveRainAlertEnabled(event.enabled);
+    final settings = repository.getSettings();
+    emit(SettingsLoaded(settings: settings));
+  }
+
+  Future<void> _onToggleTemperatureUnit(ToggleTemperatureUnit event, Emitter<SettingsState> emit) async {
+    await repository.saveTemperatureUnit(event.isCelsius);
     final settings = repository.getSettings();
     emit(SettingsLoaded(settings: settings));
   }

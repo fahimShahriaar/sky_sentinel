@@ -1,6 +1,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/utils/logger.dart';
+import '../../core/utils/temperature_utils.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -52,8 +53,10 @@ class NotificationService {
     appLogger.i('Weather alert notification shown: $title');
   }
 
-  Future<void> showTemperatureAlert(double temperature, double threshold) async {
-    await showWeatherAlert(title: '🌡️ Temperature Alert', body: 'Temperature exceeded ${threshold.toStringAsFixed(0)}°F! Current: ${temperature.toStringAsFixed(0)}°F', payload: AppConstants.alertPayloadTemp);
+  Future<void> showTemperatureAlert(double temperature, double threshold, {bool isCelsius = true}) async {
+    final tempStr = TemperatureUtils.formatTempWithUnit(temperature, isCelsius);
+    final thresholdStr = TemperatureUtils.formatTempWithUnit(threshold, isCelsius);
+    await showWeatherAlert(title: '🌡️ Temperature Alert', body: 'Temperature exceeded $thresholdStr! Current: $tempStr', payload: AppConstants.alertPayloadTemp);
   }
 
   Future<void> showRainAlert({double? rainVolume}) async {

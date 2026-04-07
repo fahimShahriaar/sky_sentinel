@@ -10,6 +10,7 @@ class AppConstants {
   static const String cachedLocationNameKey = 'cached_location_name';
   static const String tempThresholdKey = 'temp_threshold';
   static const String rainAlertKey = 'rain_alert_enabled';
+  static const String tempUnitCelsiusKey = 'temp_unit_celsius';
   static const String lastUpdatedKey = 'last_updated';
 
   // Background Task
@@ -17,8 +18,9 @@ class AppConstants {
   static const Duration backgroundTaskFrequency = Duration(minutes: 15);
 
   // Default Thresholds
-  static const double defaultTempThreshold = 95.0; // Fahrenheit
+  static const double defaultTempThreshold = 95.0; // Fahrenheit (stored internally)
   static const bool defaultRainAlertEnabled = true;
+  static const bool defaultIsCelsius = true;
 
   // Notification
   static const String notificationChannelId = 'sky_sentinel_alerts';

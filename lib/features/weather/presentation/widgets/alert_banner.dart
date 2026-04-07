@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/temperature_utils.dart';
 
 class AlertBanner extends StatelessWidget {
   final bool isTemperatureAlert;
@@ -7,18 +8,19 @@ class AlertBanner extends StatelessWidget {
   final double temperature;
   final double threshold;
   final double? rainVolume;
+  final bool isCelsius;
 
-  const AlertBanner({super.key, required this.isTemperatureAlert, required this.isRainAlert, required this.temperature, required this.threshold, this.rainVolume});
+  const AlertBanner({super.key, required this.isTemperatureAlert, required this.isRainAlert, required this.temperature, required this.threshold, this.rainVolume, required this.isCelsius});
 
   @override
   Widget build(BuildContext context) {
     String message;
     if (isRainAlert && isTemperatureAlert) {
-      message = 'Rain threshold: ${rainVolume?.toStringAsFixed(1) ?? '0.1'}in met • Temp: ${temperature.toStringAsFixed(0)}°F';
+      message = 'Rain threshold: ${rainVolume?.toStringAsFixed(1) ?? '0.1'}in met • Temp: ${TemperatureUtils.formatTempWithUnit(temperature, isCelsius)}';
     } else if (isRainAlert) {
       message = 'Rain threshold: ${rainVolume?.toStringAsFixed(1) ?? '0.1'}in met';
     } else {
-      message = 'Temperature: ${temperature.toStringAsFixed(0)}°F exceeds ${threshold.toStringAsFixed(0)}°F';
+      message = 'Temperature: ${TemperatureUtils.formatTempWithUnit(temperature, isCelsius)} exceeds ${TemperatureUtils.formatTempWithUnit(threshold, isCelsius)}';
     }
 
     return Container(

@@ -20,6 +20,7 @@ void callbackDispatcher() {
       // Get settings
       final tempThreshold = prefs.getDouble(AppConstants.tempThresholdKey) ?? AppConstants.defaultTempThreshold;
       final rainAlertEnabled = prefs.getBool(AppConstants.rainAlertKey) ?? AppConstants.defaultRainAlertEnabled;
+      final isCelsius = prefs.getBool(AppConstants.tempUnitCelsiusKey) ?? AppConstants.defaultIsCelsius;
 
       // Get location — try last known first (instant), then fresh fix
       Position? position;
@@ -68,7 +69,7 @@ void callbackDispatcher() {
         // Check temperature threshold
         if (temperature > tempThreshold) {
           appLogger.i('Background: Temperature $temperature > $tempThreshold, alerting');
-          await notificationService.showTemperatureAlert(temperature, tempThreshold);
+          await notificationService.showTemperatureAlert(temperature, tempThreshold, isCelsius: isCelsius);
         }
 
         // Check rain

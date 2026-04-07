@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/temperature_utils.dart';
+import '../../../settings/presentation/bloc/settings_bloc.dart';
+import '../../../settings/presentation/bloc/settings_state.dart';
 import '../../data/models/weather_model.dart';
 
 class AlertModal extends StatelessWidget {
@@ -13,10 +17,19 @@ class AlertModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return BlocBuilder<SettingsBloc, SettingsState>(
+      builder: (context, settingsState) {
+        final isCelsius = settingsState is SettingsLoaded ? settingsState.settings.isCelsius : true;
+        return _buildModal(context, isCelsius);
+      },
+    );
+  }
+
+  Widget _buildModal(BuildContext context, bool isCelsius) {
     final isRainAlert = alertType == AppConstants.alertPayloadRain;
     final title = isRainAlert ? 'Rain Detected' : 'Temperature Alert';
     final subtitle = isRainAlert ? 'Precipitation Spike Observed' : 'Temperature Threshold Exceeded';
-    final mainValue = isRainAlert ? '${weather.rainVolume?.toStringAsFixed(1) ?? '0.2'}in' : '${weather.temperature.toStringAsFixed(0)}°F';
+    final mainValue = isRainAlert ? '${weather.rainVolume?.toStringAsFixed(1) ?? '0.2'}in' : TemperatureUtils.formatTempWithUnit(weather.temperature, isCelsius);
 
     return Container(
       color: Colors.black.withValues(alpha: 0.7),
@@ -95,7 +108,7 @@ class AlertModal extends StatelessWidget {
                         : [
                             const TextSpan(text: 'Temperature has risen to '),
                             TextSpan(
-                              text: '${weather.temperature.toStringAsFixed(0)}°F',
+                              text: TemperatureUtils.formatTempWithUnit(weather.temperature, isCelsius),
                               style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                             ),
                             const TextSpan(text: '.\nStay hydrated and avoid prolonged sun exposure.'),
