@@ -181,26 +181,19 @@ This project was developed with the assistance of **Claude (Anthropic)** via Git
    cd intlmachines
    ```
 
-2. **Set your API key:**
-   Open `lib/core/constants/api_constants.dart` and replace:
-   ```dart
-   static const String apiKey = 'YOUR_API_KEY_HERE';
-   ```
-   with your actual OpenWeatherMap API key.
-
-3. **Install dependencies:**
+2. **Install dependencies:**
    ```bash
    flutter pub get
    ```
 
-4. **Run the app:**
+3. **Run the app** (pass your API key via `--dart-define`):
    ```bash
-   flutter run
+   flutter run --dart-define=OWM_API_KEY=your_api_key_here
    ```
 
 ### For Release Build:
 ```bash
-flutter build apk --release
+flutter build apk --release --dart-define=OWM_API_KEY=your_api_key_here
 ```
 
 ---
