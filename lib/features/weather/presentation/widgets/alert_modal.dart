@@ -35,7 +35,7 @@ class AlertModal extends StatelessWidget {
     final isRainAlert = alertType == AppConstants.alertPayloadRain;
     final title = isRainAlert ? 'Rain Detected' : 'Temperature Alert';
     final subtitle = isRainAlert ? 'Precipitation Spike Observed' : 'Temperature Threshold Exceeded';
-    final mainValue = isRainAlert ? '${weather.rainVolume?.toStringAsFixed(1) ?? '0.2'}in' : TemperatureUtils.formatTempWithUnit(weather.temperature, isCelsius);
+    final mainValue = isRainAlert ? '${weather.rainVolume?.toStringAsFixed(1) ?? '0.2'}mm' : TemperatureUtils.formatTempWithUnit(weather.temperature, isCelsius);
 
     return Container(
       color: Colors.black.withValues(alpha: 0.7),
@@ -61,7 +61,7 @@ class AlertModal extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 24),
                 child: Text(
-                  'ATMOSPHERIC ALERT',
+                  'WEATHER ALERT',
                   style: TextStyle(
                     color: AppColors.accentCyan,
                     fontSize: 11,
@@ -134,17 +134,17 @@ class AlertModal extends StatelessWidget {
                     ),
                     children: isRainAlert
                         ? [
-                            const TextSpan(text: 'Threshold of '),
-                            const TextSpan(
-                              text: '0.1in',
-                              style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                            const TextSpan(text: 'Rain volume of '),
+                            TextSpan(
+                              text: '${weather.rainVolume?.toStringAsFixed(1) ?? '0.0'}mm/h',
+                              style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                             ),
-                            const TextSpan(text: ' exceeded.\nExpect rain for the next '),
-                            const TextSpan(
-                              text: '2 hours',
-                              style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                            const TextSpan(text: ' detected.\nHumidity is at '),
+                            TextSpan(
+                              text: '${weather.humidity}%',
+                              style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                             ),
-                            const TextSpan(text: '.'),
+                            const TextSpan(text: '. Don\'t forget your umbrella!'),
                           ]
                         : [
                             const TextSpan(text: 'Temperature has risen to '),
@@ -199,10 +199,10 @@ class AlertModal extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
               // Bottom stats
-              Container(
+              /* Container(
                 decoration: BoxDecoration(
                   color: AppColors.backgroundDark.withValues(alpha: 0.5),
                   borderRadius: const BorderRadius.only(
@@ -286,6 +286,7 @@ class AlertModal extends StatelessWidget {
                   ],
                 ),
               ),
+             */
             ],
           ),
         ),

@@ -28,10 +28,6 @@ class SettingsPage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       children: [
         // Header
-        Text(
-          'ATMOSPHERIC INTELLIGENCE',
-          style: TextStyle(color: AppColors.accentCyan, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 2),
-        ),
         const SizedBox(height: 8),
         Text('Settings', style: Theme.of(context).textTheme.headlineLarge),
         const SizedBox(height: 4),
@@ -312,8 +308,8 @@ class SettingsPage extends StatelessWidget {
               _buildAboutRow('Data Source', 'OpenWeatherMap API'),
               const Divider(color: AppColors.divider, height: 24),
               _buildAboutRow('Background Check', 'Every 15 minutes'),
-              const Divider(color: AppColors.divider, height: 24),
-              _buildAboutRow('Architecture', 'BLoC + Clean Architecture'),
+              // const Divider(color: AppColors.divider, height: 24),
+              // _buildAboutRow('Architecture', 'BLoC + Clean Architecture'),
             ],
           ),
         ),

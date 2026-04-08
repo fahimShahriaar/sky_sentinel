@@ -69,7 +69,15 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
       final lastUpdated = await repository.getLastUpdated();
       final alertHighlight = currentState is WeatherLoaded ? currentState.alertHighlight : null;
 
-      emit(WeatherLoaded(weather: weather as dynamic, forecast: forecast as dynamic, lastUpdated: lastUpdated, alertHighlight: alertHighlight));
+      // Fetch air quality separately so it doesn't block/fail the main data
+      dynamic airQuality;
+      try {
+        airQuality = await repository.getAirQuality(event.latitude, event.longitude);
+      } catch (e) {
+        appLogger.w('Air quality fetch failed (non-critical): $e');
+      }
+
+      emit(WeatherLoaded(weather: weather as dynamic, forecast: forecast as dynamic, airQuality: airQuality, lastUpdated: lastUpdated, alertHighlight: alertHighlight));
     } on CacheException catch (e) {
       emit(WeatherError(message: e.message));
     } on ServerException catch (e) {

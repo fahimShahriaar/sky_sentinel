@@ -6,10 +6,12 @@ import '../../../../core/errors/exceptions.dart';
 import '../../../../core/utils/logger.dart';
 import '../models/weather_model.dart';
 import '../models/forecast_model.dart';
+import '../models/air_quality_model.dart';
 
 abstract class WeatherRemoteDataSource {
   Future<WeatherModel> getCurrentWeather(double lat, double lon);
   Future<ForecastModel> getForecast(double lat, double lon);
+  Future<AirQualityModel> getAirQuality(double lat, double lon);
 }
 
 class WeatherRemoteDataSourceImpl implements WeatherRemoteDataSource {
@@ -48,6 +50,23 @@ class WeatherRemoteDataSourceImpl implements WeatherRemoteDataSource {
       }
     } on DioException catch (e) {
       appLogger.e('Dio error fetching forecast: ${e.message}');
+      throw ServerException(message: e.message ?? 'Network error occurred', statusCode: e.response?.statusCode);
+    }
+  }
+
+  @override
+  Future<AirQualityModel> getAirQuality(double lat, double lon) async {
+    try {
+      appLogger.i('Fetching air quality for ($lat, $lon)');
+      final response = await dio.get(ApiConstants.airPollution(lat, lon));
+
+      if (response.statusCode == 200) {
+        return AirQualityModel.fromJson(response.data as Map<String, dynamic>);
+      } else {
+        throw ServerException(message: 'Failed to fetch air quality data', statusCode: response.statusCode);
+      }
+    } on DioException catch (e) {
+      appLogger.e('Dio error fetching air quality: ${e.message}');
       throw ServerException(message: e.message ?? 'Network error occurred', statusCode: e.response?.statusCode);
     }
   }

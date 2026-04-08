@@ -6,6 +6,7 @@ import '../../../../core/utils/weather_icon_helper.dart';
 import '../../../../core/utils/temperature_utils.dart';
 import '../../../settings/presentation/bloc/settings_bloc.dart';
 import '../../../settings/presentation/bloc/settings_state.dart';
+import '../../data/models/air_quality_model.dart';
 import '../bloc/weather_bloc.dart';
 import '../bloc/weather_state.dart';
 import '../bloc/weather_event.dart';
@@ -28,7 +29,7 @@ class ForecastPage extends StatelessWidget {
         }
 
         if (state is WeatherError && state.cachedForecast != null) {
-          return _buildForecastList(context, state.cachedForecast!);
+          return _buildForecastList(context, state.cachedForecast!, null);
         }
 
         return _buildEmptyView(context);
@@ -47,11 +48,11 @@ class ForecastPage extends StatelessWidget {
           await context.read<WeatherBloc>().stream.firstWhere((s) => s is WeatherLoaded || s is WeatherError);
         }
       },
-      child: _buildForecastList(context, state.forecast!),
+      child: _buildForecastList(context, state.forecast!, state.airQuality),
     );
   }
 
-  Widget _buildForecastList(BuildContext context, dynamic forecast) {
+  Widget _buildForecastList(BuildContext context, dynamic forecast, AirQualityModel? airQuality) {
     final days = forecast.days;
     final cityName = forecast.cityName;
 
@@ -63,10 +64,6 @@ class ForecastPage extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           children: [
             // Header
-            Text(
-              'ATMOSPHERIC INTELLIGENCE',
-              style: TextStyle(color: AppColors.accentCyan, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 2),
-            ),
             const SizedBox(height: 8),
             Text(
               'Weekly Forecast',
@@ -174,68 +171,91 @@ class ForecastPage extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            // Air Quality Card (placeholder)
-            Container(
-              decoration: BoxDecoration(
-                gradient: AppColors.cardGradient,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.cardBorder),
-              ),
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: AppColors.accentTeal.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(
-                      Icons.eco,
-                      color: AppColors.accentTeal,
-                      size: 22,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'AIR QUALITY',
-                        style: TextStyle(
-                          color: AppColors.textTertiary,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 1,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Icon(Icons.circle, size: 8, color: AppColors.accentTeal),
-                          const SizedBox(width: 6),
-                          const Text(
-                            'Good • 24 AQI',
-                            style: TextStyle(
-                              color: AppColors.textPrimary,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+            // Air Quality Card
+            _buildAirQualityCard(airQuality),
 
             const SizedBox(height: 24),
           ],
         );
       },
     );
+  }
+
+  Widget _buildAirQualityCard(AirQualityModel? airQuality) {
+    final label = airQuality?.label ?? '—';
+    final aqiValue = airQuality?.aqi ?? 0;
+    final color = _aqiColor(aqiValue);
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: AppColors.cardGradient,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.cardBorder),
+      ),
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(Icons.eco, color: color, size: 22),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'AIR QUALITY',
+                  style: TextStyle(
+                    color: AppColors.textTertiary,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 1,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(Icons.circle, size: 8, color: color),
+                    const SizedBox(width: 6),
+                    Text(
+                      airQuality != null ? label : 'Unavailable',
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _aqiColor(int aqi) {
+    switch (aqi) {
+      case 1:
+        return AppColors.accentTeal;
+      case 2:
+        return AppColors.alertYellow;
+      case 3:
+        return AppColors.alertOrange;
+      case 4:
+        return AppColors.alertRed;
+      case 5:
+        return const Color(0xFF8B0000);
+      default:
+        return AppColors.textTertiary;
+    }
   }
 
   Widget _buildEmptyView(BuildContext context) {

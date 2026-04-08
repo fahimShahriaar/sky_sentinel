@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -52,6 +53,7 @@ class _AppShellState extends State<AppShell> {
   int _currentIndex = 0;
   bool _showAlertModal = false;
   String? _alertPayload;
+  StreamSubscription<String>? _notificationTapSub;
 
   final List<Widget> _pages = const [DashboardPage(), ForecastPage(), SettingsPage()];
 
@@ -59,20 +61,38 @@ class _AppShellState extends State<AppShell> {
   void initState() {
     super.initState();
     _checkPendingNotification();
+    _notificationTapSub = NotificationService.onNotificationTap.listen(_handleNotificationTap);
   }
 
+  @override
+  void dispose() {
+    _notificationTapSub?.cancel();
+    super.dispose();
+  }
+
+  /// Handles cold-start: the payload saved by getNotificationAppLaunchDetails.
   void _checkPendingNotification() {
     final payload = NotificationService.pendingPayload;
     if (payload != null) {
       NotificationService.pendingPayload = null;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        setState(() {
-          _showAlertModal = true;
-          _alertPayload = payload;
-        });
-        context.read<WeatherBloc>().add(SetAlertHighlight(alertType: payload));
+        _showAlert(payload);
       });
     }
+  }
+
+  /// Handles taps while the app is already running (foreground / resumed from background).
+  void _handleNotificationTap(String payload) {
+    _showAlert(payload);
+  }
+
+  void _showAlert(String payload) {
+    setState(() {
+      _showAlertModal = true;
+      _alertPayload = payload;
+      _currentIndex = 0; // Switch to dashboard so highlight is visible
+    });
+    context.read<WeatherBloc>().add(SetAlertHighlight(alertType: payload));
   }
 
   @override
@@ -175,8 +195,8 @@ class _AppShellState extends State<AppShell> {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: Row(
         children: [
-          // Search icon
-          Icon(Icons.search, color: AppColors.textSecondary, size: 22),
+          // Location icon
+          Icon(Icons.location_on_outlined, color: AppColors.textSecondary, size: 22),
           const SizedBox(width: 12),
 
           // Location name

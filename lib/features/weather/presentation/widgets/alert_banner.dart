@@ -24,9 +24,9 @@ class AlertBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     String message;
     if (isRainAlert && isTemperatureAlert) {
-      message = 'Rain threshold: ${rainVolume?.toStringAsFixed(1) ?? '0.1'}in met • Temp: ${TemperatureUtils.formatTempWithUnit(temperature, isCelsius)}';
+      message = 'Rain threshold: ${rainVolume?.toStringAsFixed(1) ?? '0.1'}mm met • Temp: ${TemperatureUtils.formatTempWithUnit(temperature, isCelsius)}';
     } else if (isRainAlert) {
-      message = 'Rain threshold: ${rainVolume?.toStringAsFixed(1) ?? '0.1'}in met';
+      message = 'Rain threshold: ${rainVolume?.toStringAsFixed(1) ?? '0.1'}mm met';
     } else {
       message = 'Temperature: ${TemperatureUtils.formatTempWithUnit(temperature, isCelsius)} exceeds ${TemperatureUtils.formatTempWithUnit(threshold, isCelsius)}';
     }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/utils/logger.dart';
@@ -10,7 +11,12 @@ class NotificationService {
 
   final FlutterLocalNotificationsPlugin _plugin = FlutterLocalNotificationsPlugin();
 
+  /// Payload from the notification that launched the app (cold start).
   static String? pendingPayload;
+
+  /// Stream that fires when a notification is tapped while the app is running.
+  static final StreamController<String> _onTapController = StreamController<String>.broadcast();
+  static Stream<String> get onNotificationTap => _onTapController.stream;
 
   Future<void> initialize() async {
     const androidSettings = AndroidInitializationSettings(
@@ -33,6 +39,13 @@ class NotificationService {
       onDidReceiveNotificationResponse: _onNotificationTap,
     );
 
+    // Check if the app was launched by tapping a notification (cold start)
+    final launchDetails = await _plugin.getNotificationAppLaunchDetails();
+    if (launchDetails != null && launchDetails.didNotificationLaunchApp && launchDetails.notificationResponse?.payload != null) {
+      pendingPayload = launchDetails.notificationResponse!.payload;
+      appLogger.i('App launched from notification: $pendingPayload');
+    }
+
     appLogger.i('Notification service initialized');
   }
 
@@ -48,8 +61,11 @@ class NotificationService {
   }
 
   static void _onNotificationTap(NotificationResponse response) {
-    appLogger.i('Notification tapped with payload: ${response.payload}');
-    pendingPayload = response.payload;
+    final payload = response.payload;
+    appLogger.i('Notification tapped with payload: $payload');
+    if (payload != null) {
+      _onTapController.add(payload);
+    }
   }
 
   Future<void> showWeatherAlert({
@@ -107,7 +123,7 @@ class NotificationService {
   }
 
   Future<void> showRainAlert({double? rainVolume}) async {
-    final rainInfo = rainVolume != null ? ' (${rainVolume.toStringAsFixed(1)}in)' : '';
+    final rainInfo = rainVolume != null ? ' (${rainVolume.toStringAsFixed(1)}mm)' : '';
     await showWeatherAlert(
       id: AppConstants.rainNotificationId,
       title: '🌧️ Rain Alert',

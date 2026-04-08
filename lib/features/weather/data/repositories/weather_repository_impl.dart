@@ -5,6 +5,7 @@ import '../datasources/weather_remote_datasource.dart';
 import '../datasources/weather_local_datasource.dart';
 import '../models/weather_model.dart';
 import '../models/forecast_model.dart';
+import '../models/air_quality_model.dart';
 
 class WeatherRepositoryImpl implements WeatherRepository {
   final WeatherRemoteDataSource remoteDataSource;
@@ -67,5 +68,15 @@ class WeatherRepositoryImpl implements WeatherRepository {
   @override
   Future<DateTime?> getLastUpdated() async {
     return await localDataSource.getLastUpdated();
+  }
+
+  @override
+  Future<AirQualityModel> getAirQuality(double lat, double lon) async {
+    try {
+      return await remoteDataSource.getAirQuality(lat, lon);
+    } on ServerException catch (e) {
+      appLogger.w('Failed to fetch air quality: ${e.message}');
+      rethrow;
+    }
   }
 }

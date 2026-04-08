@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import '../../data/models/weather_model.dart';
 import '../../data/models/forecast_model.dart';
+import '../../data/models/air_quality_model.dart';
 
 abstract class WeatherState extends Equatable {
   const WeatherState();
@@ -26,17 +27,18 @@ class WeatherLoading extends WeatherState {
 class WeatherLoaded extends WeatherState {
   final WeatherModel weather;
   final ForecastModel? forecast;
+  final AirQualityModel? airQuality;
   final DateTime? lastUpdated;
   final String? alertHighlight;
 
-  const WeatherLoaded({required this.weather, this.forecast, this.lastUpdated, this.alertHighlight});
+  const WeatherLoaded({required this.weather, this.forecast, this.airQuality, this.lastUpdated, this.alertHighlight});
 
-  WeatherLoaded copyWith({WeatherModel? weather, ForecastModel? forecast, DateTime? lastUpdated, String? alertHighlight, bool clearAlert = false}) {
-    return WeatherLoaded(weather: weather ?? this.weather, forecast: forecast ?? this.forecast, lastUpdated: lastUpdated ?? this.lastUpdated, alertHighlight: clearAlert ? null : (alertHighlight ?? this.alertHighlight));
+  WeatherLoaded copyWith({WeatherModel? weather, ForecastModel? forecast, AirQualityModel? airQuality, DateTime? lastUpdated, String? alertHighlight, bool clearAlert = false}) {
+    return WeatherLoaded(weather: weather ?? this.weather, forecast: forecast ?? this.forecast, airQuality: airQuality ?? this.airQuality, lastUpdated: lastUpdated ?? this.lastUpdated, alertHighlight: clearAlert ? null : (alertHighlight ?? this.alertHighlight));
   }
 
   @override
-  List<Object?> get props => [weather, forecast, lastUpdated, alertHighlight];
+  List<Object?> get props => [weather, forecast, airQuality, lastUpdated, alertHighlight];
 }
 
 class WeatherError extends WeatherState {

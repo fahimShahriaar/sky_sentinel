@@ -9,4 +9,6 @@ class ApiConstants {
   static String currentWeather(double lat, double lon) => '$baseUrl/weather?lat=$lat&lon=$lon&appid=$apiKey&units=imperial';
 
   static String forecast(double lat, double lon) => '$baseUrl/forecast?lat=$lat&lon=$lon&appid=$apiKey&units=imperial';
+
+  static String airPollution(double lat, double lon) => '$baseUrl/air_pollution?lat=$lat&lon=$lon&appid=$apiKey';
 }

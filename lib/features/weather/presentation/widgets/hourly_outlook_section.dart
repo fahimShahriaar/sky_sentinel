@@ -40,7 +40,7 @@ class HourlyOutlookSection extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              GestureDetector(
+              /* GestureDetector(
                 onTap: () {
                   // Navigate to full report - can be extended
                 },
@@ -52,7 +52,7 @@ class HourlyOutlookSection extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-              ),
+              ), */
             ],
           ),
           const SizedBox(height: 20),

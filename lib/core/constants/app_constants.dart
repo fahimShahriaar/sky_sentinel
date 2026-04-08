@@ -2,7 +2,6 @@ class AppConstants {
   AppConstants._();
 
   static const String appName = 'Sky Sentinel';
-  static const String appTagline = 'Atmospheric Intelligence';
 
   // Shared Preferences Keys
   static const String cachedWeatherKey = 'cached_weather';
