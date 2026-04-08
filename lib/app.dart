@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'core/constants/app_constants.dart';
 import 'core/theme/app_colors.dart';
 import 'core/theme/app_theme.dart';
@@ -9,6 +10,7 @@ import 'features/location/presentation/bloc/location_state.dart';
 import 'features/notifications/notification_service.dart';
 import 'features/settings/presentation/bloc/settings_bloc.dart';
 import 'features/settings/presentation/bloc/settings_event.dart';
+import 'features/settings/presentation/bloc/settings_state.dart';
 import 'features/weather/presentation/bloc/weather_bloc.dart';
 import 'features/weather/presentation/bloc/weather_event.dart';
 import 'features/weather/presentation/bloc/weather_state.dart';
@@ -57,10 +59,6 @@ class _AppShellState extends State<AppShell> {
   void initState() {
     super.initState();
     _checkPendingNotification();
-    // Request notification permission after Activity is attached
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      sl<NotificationService>().requestPermission();
-    });
   }
 
   void _checkPendingNotification() {
@@ -79,49 +77,97 @@ class _AppShellState extends State<AppShell> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Column(
-              children: [
-                // App Bar
-                _buildAppBar(context),
-                // Page content
-                Expanded(child: _pages[_currentIndex]),
-              ],
-            ),
-
-            // Alert Modal Overlay
-            if (_showAlertModal && _alertPayload != null)
-              BlocBuilder<WeatherBloc, WeatherState>(
-                builder: (context, state) {
-                  if (state is WeatherLoaded) {
-                    return AlertModal(
-                      alertType: _alertPayload!,
-                      weather: state.weather,
-                      onDismiss: () {
-                        setState(() {
-                          _showAlertModal = false;
-                          _alertPayload = null;
-                        });
-                      },
-                      onViewDashboard: () {
-                        setState(() {
-                          _showAlertModal = false;
-                          _currentIndex = 0;
-                        });
-                      },
-                    );
-                  }
-                  return const SizedBox.shrink();
-                },
-              ),
-          ],
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<LocationBloc, LocationState>(
+          listener: (context, state) {
+            if (state is LocationLoaded) {
+              _cacheLocation(state.latitude, state.longitude);
+              // Request notification permission after location is resolved
+              // to avoid concurrent permission dialog conflict on Android
+              sl<NotificationService>().requestPermission();
+            }
+          },
         ),
+        BlocListener<WeatherBloc, WeatherState>(
+          listener: (context, state) {
+            if (state is WeatherLoaded) {
+              _checkAndNotify(context, state);
+            }
+          },
+        ),
+      ],
+      child: Scaffold(
+        body: SafeArea(
+          child: Stack(
+            children: [
+              Column(
+                children: [
+                  // App Bar
+                  _buildAppBar(context),
+                  // Page content
+                  Expanded(child: _pages[_currentIndex]),
+                ],
+              ),
+
+              // Alert Modal Overlay
+              if (_showAlertModal && _alertPayload != null)
+                BlocBuilder<WeatherBloc, WeatherState>(
+                  builder: (context, state) {
+                    if (state is WeatherLoaded) {
+                      return AlertModal(
+                        alertType: _alertPayload!,
+                        weather: state.weather,
+                        onDismiss: () {
+                          setState(() {
+                            _showAlertModal = false;
+                            _alertPayload = null;
+                          });
+                        },
+                        onViewDashboard: () {
+                          setState(() {
+                            _showAlertModal = false;
+                            _currentIndex = 0;
+                          });
+                        },
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
+            ],
+          ),
+        ),
+        bottomNavigationBar: _buildBottomNav(),
       ),
-      bottomNavigationBar: _buildBottomNav(),
     );
+  }
+
+  void _cacheLocation(double latitude, double longitude) {
+    final prefs = sl<SharedPreferences>();
+    prefs.setDouble(AppConstants.cachedLatitudeKey, latitude);
+    prefs.setDouble(AppConstants.cachedLongitudeKey, longitude);
+  }
+
+  void _checkAndNotify(BuildContext context, WeatherLoaded state) {
+    final settingsState = context.read<SettingsBloc>().state;
+    if (settingsState is! SettingsLoaded) return;
+
+    final settings = settingsState.settings;
+    final weather = state.weather;
+    final notificationService = sl<NotificationService>();
+
+    if (weather.temperature > settings.temperatureThreshold) {
+      notificationService.showTemperatureAlert(
+        weather.temperature,
+        settings.temperatureThreshold,
+        isCelsius: settings.isCelsius,
+      );
+    }
+
+    if (settings.rainAlertEnabled && weather.isRaining) {
+      notificationService.showRainAlert(rainVolume: weather.rainVolume);
+    }
   }
 
   Widget _buildAppBar(BuildContext context) {

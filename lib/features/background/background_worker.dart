@@ -22,35 +22,52 @@ void callbackDispatcher() {
       final rainAlertEnabled = prefs.getBool(AppConstants.rainAlertKey) ?? AppConstants.defaultRainAlertEnabled;
       final isCelsius = prefs.getBool(AppConstants.tempUnitCelsiusKey) ?? AppConstants.defaultIsCelsius;
 
-      // Get location — try last known first (instant), then fresh fix
-      Position? position;
+      // Get location — try live position first, then fall back to cached coordinates
+      double? latitude;
+      double? longitude;
+
       try {
         final hasPermission = await Geolocator.checkPermission();
         if (hasPermission == LocationPermission.always || hasPermission == LocationPermission.whileInUse) {
-          position = await Geolocator.getLastKnownPosition();
-          position ??= await Geolocator.getCurrentPosition(
-            locationSettings: const LocationSettings(
-              accuracy: LocationAccuracy.low,
-              timeLimit: Duration(seconds: 30),
-            ),
-          );
+          final position = await Geolocator.getLastKnownPosition();
+          if (position != null) {
+            latitude = position.latitude;
+            longitude = position.longitude;
+            appLogger.i('Background: Got last known position: $latitude, $longitude');
+          } else {
+            final freshPosition = await Geolocator.getCurrentPosition(
+              locationSettings: const LocationSettings(
+                accuracy: LocationAccuracy.low,
+                timeLimit: Duration(seconds: 15),
+              ),
+            );
+            latitude = freshPosition.latitude;
+            longitude = freshPosition.longitude;
+            appLogger.i('Background: Got fresh position: $latitude, $longitude');
+          }
         }
       } catch (e) {
-        appLogger.w('Background: Could not get location: $e');
+        appLogger.w('Background: Could not get live location: $e');
       }
 
-      if (position == null) {
-        appLogger.w('Background: No location available, skipping');
+      // Fall back to cached location from SharedPreferences
+      if (latitude == null || longitude == null) {
+        latitude = prefs.getDouble(AppConstants.cachedLatitudeKey);
+        longitude = prefs.getDouble(AppConstants.cachedLongitudeKey);
+        if (latitude != null && longitude != null) {
+          appLogger.i('Background: Using cached location: $latitude, $longitude');
+        }
+      }
+
+      if (latitude == null || longitude == null) {
+        appLogger.w('Background: No location available (live or cached), skipping');
         return true;
       }
 
       // Fetch weather
       final dio = Dio();
       final response = await dio.get(
-        ApiConstants.currentWeather(
-          position.latitude,
-          position.longitude,
-        ),
+        ApiConstants.currentWeather(latitude, longitude),
       );
 
       if (response.statusCode == 200) {
@@ -85,12 +102,14 @@ void callbackDispatcher() {
           appLogger.i('Background: Rain detected, alerting');
           await notificationService.showRainAlert(rainVolume: rainVolume);
         }
+
+        appLogger.i('Background: Weather check completed successfully');
       }
 
       return true;
     } catch (e) {
       appLogger.e('Background task error: $e');
-      return false;
+      return true; // Return true to avoid WorkManager retrying endlessly
     }
   });
 }
@@ -109,9 +128,20 @@ class BackgroundWorker {
       AppConstants.backgroundTaskName,
       AppConstants.backgroundTaskName,
       frequency: AppConstants.backgroundTaskFrequency,
+      existingWorkPolicy: ExistingPeriodicWorkPolicy.update,
       constraints: Constraints(networkType: NetworkType.connected),
     );
     appLogger.i('Periodic background task registered');
+  }
+
+  static Future<void> registerOneOffTask() async {
+    await Workmanager().registerOneOffTask(
+      '${AppConstants.backgroundTaskName}_oneoff',
+      AppConstants.backgroundTaskName,
+      initialDelay: Duration.zero,
+      constraints: Constraints(networkType: NetworkType.connected),
+    );
+    appLogger.i('One-off background task registered');
   }
 
   static Future<void> cancelAll() async {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sky_sentinel/features/notifications/notification_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/utils/weather_icon_helper.dart';
@@ -39,12 +38,6 @@ class DashboardPage extends StatelessWidget {
             color: AppColors.accentCyan,
             backgroundColor: AppColors.backgroundCard,
             onRefresh: () async {
-              await NotificationService().showTemperatureAlert(
-                32,
-                15,
-                isCelsius: true,
-              );
-
               final locationState = context.read<LocationBloc>().state;
               if (locationState is LocationLoaded) {
                 context.read<WeatherBloc>().add(
@@ -58,8 +51,11 @@ class DashboardPage extends StatelessWidget {
                   const FetchCurrentLocation(),
                 );
               }
-              // Wait for state change
-              await context.read<WeatherBloc>().stream.firstWhere((s) => s is WeatherLoaded || s is WeatherError);
+              // Wait for state change — notification is triggered
+              // automatically by the BlocListener in AppShell
+              await context.read<WeatherBloc>().stream.firstWhere(
+                (s) => s is WeatherLoaded || s is WeatherError,
+              );
             },
             child: _buildContent(context, weatherState),
           );

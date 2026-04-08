@@ -8,6 +8,8 @@ class AppConstants {
   static const String cachedWeatherKey = 'cached_weather';
   static const String cachedForecastKey = 'cached_forecast';
   static const String cachedLocationNameKey = 'cached_location_name';
+  static const String cachedLatitudeKey = 'cached_latitude';
+  static const String cachedLongitudeKey = 'cached_longitude';
   static const String tempThresholdKey = 'temp_threshold';
   static const String rainAlertKey = 'rain_alert_enabled';
   static const String tempUnitCelsiusKey = 'temp_unit_celsius';
@@ -26,7 +28,8 @@ class AppConstants {
   static const String notificationChannelId = 'sky_sentinel_alerts';
   static const String notificationChannelName = 'Weather Alerts';
   static const String notificationChannelDescription = 'Notifications for weather threshold alerts';
-  static const int notificationId = 1001;
+  static const int tempNotificationId = 1001;
+  static const int rainNotificationId = 1002;
 
   // Alert trigger key passed via notification payload
   static const String alertPayloadTemp = 'temperature_alert';

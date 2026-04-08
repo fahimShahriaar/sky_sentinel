@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import '../../../../core/constants/api_constants.dart';
 import '../../../../core/errors/exceptions.dart';
@@ -22,6 +24,7 @@ class WeatherRemoteDataSourceImpl implements WeatherRemoteDataSource {
       final response = await dio.get(ApiConstants.currentWeather(lat, lon));
 
       if (response.statusCode == 200) {
+        appLogger.i('Data received: ${jsonEncode(response.data)}');
         return WeatherModel.fromJson(response.data as Map<String, dynamic>);
       } else {
         throw ServerException(message: 'Failed to fetch weather data', statusCode: response.statusCode);

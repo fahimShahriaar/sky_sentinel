@@ -53,11 +53,12 @@ class NotificationService {
   }
 
   Future<void> showWeatherAlert({
+    required int id,
     required String title,
     required String body,
     required String payload,
   }) async {
-    const androidDetails = AndroidNotificationDetails(
+    final androidDetails = AndroidNotificationDetails(
       AppConstants.notificationChannelId,
       AppConstants.notificationChannelName,
       channelDescription: AppConstants.notificationChannelDescription,
@@ -65,7 +66,7 @@ class NotificationService {
       priority: Priority.high,
       showWhen: true,
       icon: '@mipmap/ic_launcher',
-      styleInformation: BigTextStyleInformation(''),
+      styleInformation: BigTextStyleInformation(body),
     );
 
     const darwinDetails = DarwinNotificationDetails(
@@ -74,13 +75,13 @@ class NotificationService {
       presentSound: true,
     );
 
-    const details = NotificationDetails(
+    final details = NotificationDetails(
       android: androidDetails,
       iOS: darwinDetails,
     );
 
     await _plugin.show(
-      AppConstants.notificationId,
+      id,
       title,
       body,
       details,
@@ -98,6 +99,7 @@ class NotificationService {
     final tempStr = TemperatureUtils.formatTempWithUnit(temperature, isCelsius);
     final thresholdStr = TemperatureUtils.formatTempWithUnit(threshold, isCelsius);
     await showWeatherAlert(
+      id: AppConstants.tempNotificationId,
       title: '🌡️ Temperature Alert',
       body: 'Temperature exceeded $thresholdStr! Current: $tempStr',
       payload: AppConstants.alertPayloadTemp,
@@ -107,6 +109,7 @@ class NotificationService {
   Future<void> showRainAlert({double? rainVolume}) async {
     final rainInfo = rainVolume != null ? ' (${rainVolume.toStringAsFixed(1)}in)' : '';
     await showWeatherAlert(
+      id: AppConstants.rainNotificationId,
       title: '🌧️ Rain Alert',
       body: 'Rain expected in your area$rainInfo. Don\'t forget your umbrella!',
       payload: AppConstants.alertPayloadRain,

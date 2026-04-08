@@ -59,7 +59,10 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
     emit(WeatherLoading(previousWeather: currentState is WeatherLoaded ? currentState.weather : null, previousForecast: currentState is WeatherLoaded ? currentState.forecast : null));
 
     try {
-      final results = await Future.wait([repository.getCurrentWeather(event.latitude, event.longitude), repository.getForecast(event.latitude, event.longitude)]);
+      final results = await Future.wait([
+        repository.getCurrentWeather(event.latitude, event.longitude),
+        repository.getForecast(event.latitude, event.longitude),
+      ]);
 
       final weather = results[0];
       final forecast = results[1];
