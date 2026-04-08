@@ -29,7 +29,12 @@ class SkySentinelApp extends StatelessWidget {
         BlocProvider<LocationBloc>(create: (_) => sl<LocationBloc>()..add(const FetchCurrentLocation())),
         BlocProvider<SettingsBloc>(create: (_) => sl<SettingsBloc>()..add(const LoadSettings())),
       ],
-      child: MaterialApp(title: AppConstants.appName, theme: AppTheme.darkTheme, debugShowCheckedModeBanner: false, home: const AppShell()),
+      child: MaterialApp(
+        title: AppConstants.appName,
+        theme: AppTheme.darkTheme,
+        debugShowCheckedModeBanner: false,
+        home: const AppShell(),
+      ),
     );
   }
 }
@@ -136,7 +141,11 @@ class _AppShellState extends State<AppShell> {
                 }
                 return Text(
                   cityName,
-                  style: const TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
                 );
               },
             ),
@@ -148,9 +157,13 @@ class _AppShellState extends State<AppShell> {
               return GestureDetector(
                 onTap: () {
                   if (state is LocationLoaded) {
-                    context.read<WeatherBloc>().add(FetchAllWeatherData(latitude: state.latitude, longitude: state.longitude));
+                    context.read<WeatherBloc>().add(
+                      FetchAllWeatherData(latitude: state.latitude, longitude: state.longitude),
+                    );
                   } else {
-                    context.read<LocationBloc>().add(const FetchCurrentLocation());
+                    context.read<LocationBloc>().add(
+                      const FetchCurrentLocation(),
+                    );
                   }
                 },
                 child: const Icon(Icons.notifications_outlined, color: AppColors.textSecondary, size: 22),
@@ -174,9 +187,21 @@ class _AppShellState extends State<AppShell> {
           setState(() => _currentIndex = index);
         },
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.bar_chart_outlined), activeIcon: Icon(Icons.bar_chart), label: 'Analytics'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings_outlined), activeIcon: Icon(Icons.settings), label: 'Settings'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            activeIcon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart_outlined),
+            activeIcon: Icon(Icons.bar_chart),
+            label: 'Analytics',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings_outlined),
+            activeIcon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
         ],
       ),
     );

@@ -10,7 +10,15 @@ class AlertBanner extends StatelessWidget {
   final double? rainVolume;
   final bool isCelsius;
 
-  const AlertBanner({super.key, required this.isTemperatureAlert, required this.isRainAlert, required this.temperature, required this.threshold, this.rainVolume, required this.isCelsius});
+  const AlertBanner({
+    super.key,
+    required this.isTemperatureAlert,
+    required this.isRainAlert,
+    required this.temperature,
+    required this.threshold,
+    this.rainVolume,
+    required this.isCelsius,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -33,15 +41,27 @@ class AlertBanner extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
-          Icon(isRainAlert ? Icons.water_drop : Icons.thermostat, color: AppColors.accentCyan, size: 18),
+          Icon(
+            isRainAlert ? Icons.water_drop : Icons.thermostat,
+            color: AppColors.accentCyan,
+            size: 18,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w400),
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+              ),
             ),
           ),
-          const Icon(Icons.close, color: AppColors.textTertiary, size: 16),
+          const Icon(
+            Icons.close,
+            color: AppColors.textTertiary,
+            size: 16,
+          ),
         ],
       ),
     );

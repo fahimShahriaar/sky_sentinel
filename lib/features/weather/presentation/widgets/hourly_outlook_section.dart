@@ -9,7 +9,11 @@ class HourlyOutlookSection extends StatelessWidget {
   final List<ForecastHour> hours;
   final bool isCelsius;
 
-  const HourlyOutlookSection({super.key, required this.hours, required this.isCelsius});
+  const HourlyOutlookSection({
+    super.key,
+    required this.hours,
+    required this.isCelsius,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +34,11 @@ class HourlyOutlookSection extends StatelessWidget {
             children: [
               const Text(
                 'Hourly Outlook',
-                style: TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               GestureDetector(
                 onTap: () {
@@ -38,7 +46,11 @@ class HourlyOutlookSection extends StatelessWidget {
                 },
                 child: const Text(
                   'View Full Report',
-                  style: TextStyle(color: AppColors.accentCyan, fontSize: 13, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    color: AppColors.accentCyan,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],
@@ -59,14 +71,26 @@ class HourlyOutlookSection extends StatelessWidget {
                     children: [
                       Text(
                         isNow ? 'NOW' : timeFormat.format(hour.dateTime),
-                        style: TextStyle(color: isNow ? AppColors.accentCyan : AppColors.textTertiary, fontSize: 11, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          color: isNow ? AppColors.accentCyan : AppColors.textTertiary,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                       const SizedBox(height: 12),
-                      Icon(WeatherIconHelper.getIcon(hour.weatherId), color: WeatherIconHelper.getIconColor(hour.weatherId), size: 24),
+                      Icon(
+                        WeatherIconHelper.getIcon(hour.weatherId),
+                        color: WeatherIconHelper.getIconColor(hour.weatherId),
+                        size: 24,
+                      ),
                       const SizedBox(height: 12),
                       Text(
                         '${TemperatureUtils.formatTemp(hour.temperature, isCelsius)}°',
-                        style: const TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w600),
+                        style: const TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ],
                   ),

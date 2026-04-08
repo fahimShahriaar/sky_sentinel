@@ -29,7 +29,10 @@ void callbackDispatcher() {
         if (hasPermission == LocationPermission.always || hasPermission == LocationPermission.whileInUse) {
           position = await Geolocator.getLastKnownPosition();
           position ??= await Geolocator.getCurrentPosition(
-            locationSettings: const LocationSettings(accuracy: LocationAccuracy.low, timeLimit: Duration(seconds: 30)),
+            locationSettings: const LocationSettings(
+              accuracy: LocationAccuracy.low,
+              timeLimit: Duration(seconds: 30),
+            ),
           );
         }
       } catch (e) {
@@ -43,7 +46,12 @@ void callbackDispatcher() {
 
       // Fetch weather
       final dio = Dio();
-      final response = await dio.get(ApiConstants.currentWeather(position.latitude, position.longitude));
+      final response = await dio.get(
+        ApiConstants.currentWeather(
+          position.latitude,
+          position.longitude,
+        ),
+      );
 
       if (response.statusCode == 200) {
         final data = response.data as Map<String, dynamic>;

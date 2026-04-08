@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sky_sentinel/features/notifications/notification_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/utils/weather_icon_helper.dart';
@@ -24,7 +25,12 @@ class DashboardPage extends StatelessWidget {
     return BlocListener<LocationBloc, LocationState>(
       listener: (context, state) {
         if (state is LocationLoaded) {
-          context.read<WeatherBloc>().add(FetchAllWeatherData(latitude: state.latitude, longitude: state.longitude));
+          context.read<WeatherBloc>().add(
+            FetchAllWeatherData(
+              latitude: state.latitude,
+              longitude: state.longitude,
+            ),
+          );
         }
       },
       child: BlocBuilder<WeatherBloc, WeatherState>(
@@ -33,11 +39,24 @@ class DashboardPage extends StatelessWidget {
             color: AppColors.accentCyan,
             backgroundColor: AppColors.backgroundCard,
             onRefresh: () async {
+              await NotificationService().showTemperatureAlert(
+                32,
+                15,
+                isCelsius: true,
+              );
+
               final locationState = context.read<LocationBloc>().state;
               if (locationState is LocationLoaded) {
-                context.read<WeatherBloc>().add(FetchAllWeatherData(latitude: locationState.latitude, longitude: locationState.longitude));
+                context.read<WeatherBloc>().add(
+                  FetchAllWeatherData(
+                    latitude: locationState.latitude,
+                    longitude: locationState.longitude,
+                  ),
+                );
               } else {
-                context.read<LocationBloc>().add(const FetchCurrentLocation());
+                context.read<LocationBloc>().add(
+                  const FetchCurrentLocation(),
+                );
               }
               // Wait for state change
               await context.read<WeatherBloc>().stream.firstWhere((s) => s is WeatherLoaded || s is WeatherError);
@@ -55,12 +74,27 @@ class DashboardPage extends StatelessWidget {
     }
     if (state is WeatherError) {
       if (state.cachedWeather != null) {
-        return _buildWeatherView(context, state.cachedWeather!, null, null, errorMessage: state.message);
+        return _buildWeatherView(
+          context,
+          state.cachedWeather!,
+          null,
+          null,
+          errorMessage: state.message,
+        );
       }
-      return _buildErrorView(context, state.message);
+      return _buildErrorView(
+        context,
+        state.message,
+      );
     }
     if (state is WeatherLoaded) {
-      return _buildWeatherView(context, state.weather, state.forecast, state.lastUpdated, alertHighlight: state.alertHighlight);
+      return _buildWeatherView(
+        context,
+        state.weather,
+        state.forecast,
+        state.lastUpdated,
+        alertHighlight: state.alertHighlight,
+      );
     }
 
     // Initial state - show loading
@@ -75,9 +109,19 @@ class DashboardPage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.location_searching, size: 64, color: AppColors.accentCyan.withValues(alpha: 0.5)),
+                Icon(
+                  Icons.location_searching,
+                  size: 64,
+                  color: AppColors.accentCyan.withValues(alpha: 0.5),
+                ),
                 const SizedBox(height: 16),
-                Text('Getting your location...', style: TextStyle(color: AppColors.textSecondary, fontSize: 16)),
+                Text(
+                  'Getting your location...',
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 16,
+                  ),
+                ),
                 const SizedBox(height: 24),
                 const CircularProgressIndicator(color: AppColors.accentCyan),
               ],
@@ -98,7 +142,10 @@ class DashboardPage extends StatelessWidget {
             top: 0,
             left: 0,
             right: 0,
-            child: LinearProgressIndicator(color: AppColors.accentCyan, backgroundColor: AppColors.backgroundCard),
+            child: LinearProgressIndicator(
+              color: AppColors.accentCyan,
+              backgroundColor: AppColors.backgroundCard,
+            ),
           ),
         ],
       );
@@ -113,7 +160,13 @@ class DashboardPage extends StatelessWidget {
               children: [
                 const CircularProgressIndicator(color: AppColors.accentCyan),
                 const SizedBox(height: 16),
-                Text('Fetching weather data...', style: TextStyle(color: AppColors.textSecondary, fontSize: 16)),
+                Text(
+                  'Fetching weather data...',
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 16,
+                  ),
+                ),
               ],
             ),
           ),
@@ -148,7 +201,10 @@ class DashboardPage extends StatelessWidget {
                     },
                     icon: const Icon(Icons.refresh),
                     label: const Text('Retry'),
-                    style: ElevatedButton.styleFrom(backgroundColor: AppColors.accentCyan, foregroundColor: AppColors.backgroundDark),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.accentCyan,
+                      foregroundColor: AppColors.backgroundDark,
+                    ),
                   ),
                 ],
               ),
@@ -159,7 +215,14 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-  Widget _buildWeatherView(BuildContext context, dynamic weather, dynamic forecast, DateTime? lastUpdated, {String? errorMessage, String? alertHighlight}) {
+  Widget _buildWeatherView(
+    BuildContext context,
+    dynamic weather,
+    dynamic forecast,
+    DateTime? lastUpdated, {
+    String? errorMessage,
+    String? alertHighlight,
+  }) {
     final now = DateTime.now();
     String updatedText = 'JUST NOW';
     if (lastUpdated != null) {
@@ -188,7 +251,14 @@ class DashboardPage extends StatelessWidget {
               final isRaining = weather.isRaining && settings.rainAlertEnabled;
 
               if (isOverTemp || isRaining) {
-                return AlertBanner(isTemperatureAlert: isOverTemp, isRainAlert: isRaining, temperature: weather.temperature, threshold: settings.temperatureThreshold, rainVolume: weather.rainVolume, isCelsius: isCelsius);
+                return AlertBanner(
+                  isTemperatureAlert: isOverTemp,
+                  isRainAlert: isRaining,
+                  temperature: weather.temperature,
+                  threshold: settings.temperatureThreshold,
+                  rainVolume: weather.rainVolume,
+                  isCelsius: isCelsius,
+                );
               }
             }
             return const SizedBox.shrink();
@@ -209,7 +279,13 @@ class DashboardPage extends StatelessWidget {
                 const Icon(Icons.info_outline, color: AppColors.alertRed, size: 20),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text('Using cached data. $errorMessage', style: const TextStyle(color: AppColors.alertRed, fontSize: 12)),
+                  child: Text(
+                    'Using cached data. $errorMessage',
+                    style: const TextStyle(
+                      color: AppColors.alertRed,
+                      fontSize: 12,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -230,13 +306,22 @@ class DashboardPage extends StatelessWidget {
                     children: [
                       Text(
                         '${TemperatureUtils.formatTemp(weather.temperature, isCelsius)}°',
-                        style: TextStyle(fontSize: 96, fontWeight: FontWeight.w200, color: AppColors.textPrimary, height: 1),
+                        style: TextStyle(
+                          fontSize: 96,
+                          fontWeight: FontWeight.w200,
+                          color: AppColors.textPrimary,
+                          height: 1,
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 16),
                         child: Text(
                           TemperatureUtils.unitLabel(isCelsius),
-                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w300, color: AppColors.accentCyan),
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w300,
+                            color: AppColors.accentCyan,
+                          ),
                         ),
                       ),
                     ],
@@ -245,18 +330,31 @@ class DashboardPage extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(WeatherIconHelper.getIcon(weather.weatherId), color: WeatherIconHelper.getIconColor(weather.weatherId), size: 20),
+                      Icon(
+                        WeatherIconHelper.getIcon(weather.weatherId),
+                        color: WeatherIconHelper.getIconColor(weather.weatherId),
+                        size: 20,
+                      ),
                       const SizedBox(width: 8),
                       Text(
                         weather.conditionDescription[0].toUpperCase() + weather.conditionDescription.substring(1),
-                        style: const TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.w400),
+                        style: const TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 6),
                   Text(
                     updatedText,
-                    style: const TextStyle(color: AppColors.textTertiary, fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 1.5),
+                    style: const TextStyle(
+                      color: AppColors.textTertiary,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 1.5,
+                    ),
                   ),
                 ],
               ),
@@ -268,12 +366,25 @@ class DashboardPage extends StatelessWidget {
 
         // Info cards
         _buildAnimatedCard(
-          child: WeatherInfoCard(icon: Icons.water_drop_outlined, iconColor: AppColors.accentCyan, label: 'Humidity', value: '${weather.humidity}%', highlighted: false),
+          child: WeatherInfoCard(
+            icon: Icons.water_drop_outlined,
+            iconColor: AppColors.accentCyan,
+            label: 'Humidity',
+            value: '${weather.humidity}%',
+            highlighted: false,
+          ),
           highlighted: alertHighlight == AppConstants.alertPayloadRain,
         ),
         const SizedBox(height: 12),
         _buildAnimatedCard(
-          child: WeatherInfoCard(icon: Icons.air, iconColor: AppColors.textSecondary, label: 'Wind Speed', value: '${weather.windSpeed.toStringAsFixed(0)} mph', suffix: weather.windDirection, highlighted: false),
+          child: WeatherInfoCard(
+            icon: Icons.air,
+            iconColor: AppColors.textSecondary,
+            label: 'Wind Speed',
+            value: '${weather.windSpeed.toStringAsFixed(0)} mph',
+            suffix: weather.windDirection,
+            highlighted: false,
+          ),
           highlighted: false,
         ),
         const SizedBox(height: 12),
@@ -281,7 +392,14 @@ class DashboardPage extends StatelessWidget {
           builder: (context, settingsState) {
             final isCelsius = settingsState is SettingsLoaded ? settingsState.settings.isCelsius : true;
             return _buildAnimatedCard(
-              child: WeatherInfoCard(icon: Icons.thermostat, iconColor: _getUvColor(weather.temperature), label: 'Feels Like', value: TemperatureUtils.formatTempWithUnit(weather.feelsLike, isCelsius), suffix: _getFeelsLikeLabel(weather.feelsLike), highlighted: alertHighlight == AppConstants.alertPayloadTemp),
+              child: WeatherInfoCard(
+                icon: Icons.thermostat,
+                iconColor: _getUvColor(weather.temperature),
+                label: 'Feels Like',
+                value: TemperatureUtils.formatTempWithUnit(weather.feelsLike, isCelsius),
+                suffix: _getFeelsLikeLabel(weather.feelsLike),
+                highlighted: alertHighlight == AppConstants.alertPayloadTemp,
+              ),
               highlighted: alertHighlight == AppConstants.alertPayloadTemp,
             );
           },
@@ -308,7 +426,13 @@ class DashboardPage extends StatelessWidget {
       return Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [BoxShadow(color: AppColors.accentCyan.withValues(alpha: 0.3), blurRadius: 12, spreadRadius: 2)],
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.accentCyan.withValues(alpha: 0.3),
+              blurRadius: 12,
+              spreadRadius: 2,
+            ),
+          ],
         ),
         child: child,
       );

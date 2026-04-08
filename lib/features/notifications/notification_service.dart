@@ -13,13 +13,25 @@ class NotificationService {
   static String? pendingPayload;
 
   Future<void> initialize() async {
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
 
-    const darwinSettings = DarwinInitializationSettings(requestAlertPermission: true, requestBadgePermission: true, requestSoundPermission: true);
+    const darwinSettings = DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
 
-    const initSettings = InitializationSettings(android: androidSettings, iOS: darwinSettings);
+    const initSettings = InitializationSettings(
+      android: androidSettings,
+      iOS: darwinSettings,
+    );
 
-    await _plugin.initialize(initSettings, onDidReceiveNotificationResponse: _onNotificationTap);
+    await _plugin.initialize(
+      initSettings,
+      onDidReceiveNotificationResponse: _onNotificationTap,
+    );
 
     // Request permissions on Android 13+
     await _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
@@ -32,7 +44,11 @@ class NotificationService {
     pendingPayload = response.payload;
   }
 
-  Future<void> showWeatherAlert({required String title, required String body, required String payload}) async {
+  Future<void> showWeatherAlert({
+    required String title,
+    required String body,
+    required String payload,
+  }) async {
     const androidDetails = AndroidNotificationDetails(
       AppConstants.notificationChannelId,
       AppConstants.notificationChannelName,
@@ -44,23 +60,48 @@ class NotificationService {
       styleInformation: BigTextStyleInformation(''),
     );
 
-    const darwinDetails = DarwinNotificationDetails(presentAlert: true, presentBadge: true, presentSound: true);
+    const darwinDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
 
-    const details = NotificationDetails(android: androidDetails, iOS: darwinDetails);
+    const details = NotificationDetails(
+      android: androidDetails,
+      iOS: darwinDetails,
+    );
 
-    await _plugin.show(AppConstants.notificationId, title, body, details, payload: payload);
+    await _plugin.show(
+      AppConstants.notificationId,
+      title,
+      body,
+      details,
+      payload: payload,
+    );
 
     appLogger.i('Weather alert notification shown: $title');
   }
 
-  Future<void> showTemperatureAlert(double temperature, double threshold, {bool isCelsius = true}) async {
+  Future<void> showTemperatureAlert(
+    double temperature,
+    double threshold, {
+    bool isCelsius = true,
+  }) async {
     final tempStr = TemperatureUtils.formatTempWithUnit(temperature, isCelsius);
     final thresholdStr = TemperatureUtils.formatTempWithUnit(threshold, isCelsius);
-    await showWeatherAlert(title: '🌡️ Temperature Alert', body: 'Temperature exceeded $thresholdStr! Current: $tempStr', payload: AppConstants.alertPayloadTemp);
+    await showWeatherAlert(
+      title: '🌡️ Temperature Alert',
+      body: 'Temperature exceeded $thresholdStr! Current: $tempStr',
+      payload: AppConstants.alertPayloadTemp,
+    );
   }
 
   Future<void> showRainAlert({double? rainVolume}) async {
     final rainInfo = rainVolume != null ? ' (${rainVolume.toStringAsFixed(1)}in)' : '';
-    await showWeatherAlert(title: '🌧️ Rain Alert', body: 'Rain expected in your area$rainInfo. Don\'t forget your umbrella!', payload: AppConstants.alertPayloadRain);
+    await showWeatherAlert(
+      title: '🌧️ Rain Alert',
+      body: 'Rain expected in your area$rainInfo. Don\'t forget your umbrella!',
+      payload: AppConstants.alertPayloadRain,
+    );
   }
 }

@@ -68,9 +68,18 @@ class ForecastPage extends StatelessWidget {
               style: TextStyle(color: AppColors.accentCyan, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 2),
             ),
             const SizedBox(height: 8),
-            Text('Weekly Forecast', style: Theme.of(context).textTheme.headlineLarge),
+            Text(
+              'Weekly Forecast',
+              style: Theme.of(context).textTheme.headlineLarge,
+            ),
             const SizedBox(height: 4),
-            Text('Next ${days.length} days atmospheric outlook for $cityName.', style: const TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+            Text(
+              'Next ${days.length} days atmospheric outlook for $cityName.',
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 14,
+              ),
+            ),
             const SizedBox(height: 24),
 
             // Forecast cards
@@ -98,19 +107,32 @@ class ForecastPage extends StatelessWidget {
                         children: [
                           Text(
                             isToday ? 'TODAY • ${dateFormat.format(day.date).toUpperCase()}' : dateFormat.format(day.date).toUpperCase(),
-                            style: TextStyle(color: isToday ? AppColors.accentCyan : AppColors.textTertiary, fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 1),
+                            style: TextStyle(
+                              color: isToday ? AppColors.accentCyan : AppColors.textTertiary,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 1,
+                            ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             dayFormat.format(day.date),
-                            style: const TextStyle(color: AppColors.textPrimary, fontSize: 20, fontWeight: FontWeight.w600),
+                            style: const TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ],
                       ),
                     ),
 
                     // Weather icon
-                    Icon(WeatherIconHelper.getIcon(day.weatherId), color: WeatherIconHelper.getIconColor(day.weatherId), size: 32),
+                    Icon(
+                      WeatherIconHelper.getIcon(day.weatherId),
+                      color: WeatherIconHelper.getIconColor(day.weatherId),
+                      size: 32,
+                    ),
                     const SizedBox(width: 16),
 
                     // Temps
@@ -124,13 +146,24 @@ class ForecastPage extends StatelessWidget {
                               '${TemperatureUtils.formatTemp(day.tempMax, isCelsius)}°',
                               style: const TextStyle(color: AppColors.textPrimary, fontSize: 24, fontWeight: FontWeight.w600),
                             ),
-                            Text('/${TemperatureUtils.formatTemp(day.tempMin, isCelsius)}°', style: const TextStyle(color: AppColors.textTertiary, fontSize: 16)),
+                            Text(
+                              '/${TemperatureUtils.formatTemp(day.tempMin, isCelsius)}°',
+                              style: const TextStyle(
+                                color: AppColors.textTertiary,
+                                fontSize: 16,
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 2),
                         Text(
                           WeatherIconHelper.getConditionText(day.weatherId),
-                          style: TextStyle(color: day.isRaining ? AppColors.accentCyan : AppColors.textTertiary, fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 0.5),
+                          style: TextStyle(
+                            color: day.isRaining ? AppColors.accentCyan : AppColors.textTertiary,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.5,
+                          ),
                         ),
                       ],
                     ),
@@ -154,8 +187,15 @@ class ForecastPage extends StatelessWidget {
                   Container(
                     width: 40,
                     height: 40,
-                    decoration: BoxDecoration(color: AppColors.accentTeal.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
-                    child: const Icon(Icons.eco, color: AppColors.accentTeal, size: 22),
+                    decoration: BoxDecoration(
+                      color: AppColors.accentTeal.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.eco,
+                      color: AppColors.accentTeal,
+                      size: 22,
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Column(
@@ -163,7 +203,12 @@ class ForecastPage extends StatelessWidget {
                     children: [
                       const Text(
                         'AIR QUALITY',
-                        style: TextStyle(color: AppColors.textTertiary, fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 1),
+                        style: TextStyle(
+                          color: AppColors.textTertiary,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Row(
@@ -172,7 +217,11 @@ class ForecastPage extends StatelessWidget {
                           const SizedBox(width: 6),
                           const Text(
                             'Good • 24 AQI',
-                            style: TextStyle(color: AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w500),
+                            style: TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ],
                       ),
@@ -194,11 +243,27 @@ class ForecastPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.calendar_today, size: 64, color: AppColors.textTertiary.withValues(alpha: 0.5)),
+          Icon(
+            Icons.calendar_today,
+            size: 64,
+            color: AppColors.textTertiary.withValues(alpha: 0.5),
+          ),
           const SizedBox(height: 16),
-          const Text('No forecast data available', style: TextStyle(color: AppColors.textSecondary, fontSize: 16)),
+          const Text(
+            'No forecast data available',
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 16,
+            ),
+          ),
           const SizedBox(height: 8),
-          const Text('Pull to refresh on the dashboard', style: TextStyle(color: AppColors.textTertiary, fontSize: 14)),
+          const Text(
+            'Pull to refresh on the dashboard',
+            style: TextStyle(
+              color: AppColors.textTertiary,
+              fontSize: 14,
+            ),
+          ),
         ],
       ),
     );

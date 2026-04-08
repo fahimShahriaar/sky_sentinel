@@ -13,7 +13,13 @@ class AlertModal extends StatelessWidget {
   final VoidCallback onDismiss;
   final VoidCallback onViewDashboard;
 
-  const AlertModal({super.key, required this.alertType, required this.weather, required this.onDismiss, required this.onViewDashboard});
+  const AlertModal({
+    super.key,
+    required this.alertType,
+    required this.weather,
+    required this.onDismiss,
+    required this.onViewDashboard,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +43,14 @@ class AlertModal extends StatelessWidget {
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 24),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFF0D1B2A), Color(0xFF0A1628)]),
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xFF0D1B2A),
+                Color(0xFF0A1628),
+              ],
+            ),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(color: AppColors.accentCyan.withValues(alpha: 0.2)),
           ),
@@ -49,7 +62,12 @@ class AlertModal extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 24),
                 child: Text(
                   'ATMOSPHERIC ALERT',
-                  style: TextStyle(color: AppColors.accentCyan, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 2),
+                  style: TextStyle(
+                    color: AppColors.accentCyan,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 2,
+                  ),
                 ),
               ),
 
@@ -59,8 +77,15 @@ class AlertModal extends StatelessWidget {
               Container(
                 width: 80,
                 height: 80,
-                decoration: BoxDecoration(color: AppColors.accentCyan.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(24)),
-                child: Icon(isRainAlert ? Icons.cloud : Icons.thermostat, color: AppColors.accentCyan, size: 40),
+                decoration: BoxDecoration(
+                  color: AppColors.accentCyan.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Icon(
+                  isRainAlert ? Icons.cloud : Icons.thermostat,
+                  color: AppColors.accentCyan,
+                  size: 40,
+                ),
               ),
 
               const SizedBox(height: 24),
@@ -68,18 +93,30 @@ class AlertModal extends StatelessWidget {
               // Title
               Text(
                 '$title:',
-                style: const TextStyle(color: AppColors.textPrimary, fontSize: 22, fontWeight: FontWeight.w700),
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
               Text(
                 mainValue,
-                style: const TextStyle(color: AppColors.textPrimary, fontSize: 28, fontWeight: FontWeight.w700),
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 28,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
 
               const SizedBox(height: 8),
 
               Text(
                 subtitle,
-                style: const TextStyle(color: AppColors.accentCyan, fontSize: 14, fontWeight: FontWeight.w500),
+                style: const TextStyle(
+                  color: AppColors.accentCyan,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
 
               const SizedBox(height: 16),
@@ -90,7 +127,11 @@ class AlertModal extends StatelessWidget {
                 child: RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
-                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 14, height: 1.5),
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 14,
+                      height: 1.5,
+                    ),
                     children: isRainAlert
                         ? [
                             const TextSpan(text: 'Threshold of '),
@@ -133,7 +174,13 @@ class AlertModal extends StatelessWidget {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       elevation: 0,
                     ),
-                    child: const Text('View Full Dashboard', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                    child: const Text(
+                      'View Full Dashboard',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -143,7 +190,13 @@ class AlertModal extends StatelessWidget {
               // Dismiss
               TextButton(
                 onPressed: onDismiss,
-                child: const Text('Dismiss Alert', style: TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+                child: const Text(
+                  'Dismiss Alert',
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 14,
+                  ),
+                ),
               ),
 
               const SizedBox(height: 16),
@@ -152,7 +205,10 @@ class AlertModal extends StatelessWidget {
               Container(
                 decoration: BoxDecoration(
                   color: AppColors.backgroundDark.withValues(alpha: 0.5),
-                  borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(24), bottomRight: Radius.circular(24)),
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(24),
+                    bottomRight: Radius.circular(24),
+                  ),
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
                 child: Row(
@@ -163,17 +219,30 @@ class AlertModal extends StatelessWidget {
                         children: [
                           const Text(
                             'CONFIDENCE',
-                            style: TextStyle(color: AppColors.textTertiary, fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 1),
+                            style: TextStyle(
+                              color: AppColors.textTertiary,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 1,
+                            ),
                           ),
                           const SizedBox(height: 6),
                           Row(
                             children: [
                               const Text(
                                 '94%',
-                                style: TextStyle(color: AppColors.textPrimary, fontSize: 22, fontWeight: FontWeight.w700),
+                                style: TextStyle(
+                                  color: AppColors.textPrimary,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                               const SizedBox(width: 8),
-                              Icon(Icons.analytics, color: AppColors.accentCyan, size: 20),
+                              Icon(
+                                Icons.analytics,
+                                color: AppColors.accentCyan,
+                                size: 20,
+                              ),
                             ],
                           ),
                         ],
@@ -188,14 +257,23 @@ class AlertModal extends StatelessWidget {
                           children: [
                             const Text(
                               'WIND SPEED',
-                              style: TextStyle(color: AppColors.textTertiary, fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 1),
+                              style: TextStyle(
+                                color: AppColors.textTertiary,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 1,
+                              ),
                             ),
                             const SizedBox(height: 6),
                             Row(
                               children: [
                                 Text(
                                   '${weather.windSpeed.toStringAsFixed(0)}mph',
-                                  style: const TextStyle(color: AppColors.textPrimary, fontSize: 22, fontWeight: FontWeight.w700),
+                                  style: const TextStyle(
+                                    color: AppColors.textPrimary,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
                                 const SizedBox(width: 8),
                                 Icon(Icons.air, color: AppColors.accentCyan, size: 20),
