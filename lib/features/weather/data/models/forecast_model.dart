@@ -54,7 +54,18 @@ class ForecastDay extends Equatable {
   final List<ForecastHour> hours;
   final List<Map<String, dynamic>> rawItems;
 
-  const ForecastDay({required this.dateKey, required this.date, required this.tempMax, required this.tempMin, required this.condition, required this.conditionDescription, required this.icon, required this.weatherId, required this.hours, required this.rawItems});
+  const ForecastDay({
+    required this.dateKey,
+    required this.date,
+    required this.tempMax,
+    required this.tempMin,
+    required this.condition,
+    required this.conditionDescription,
+    required this.icon,
+    required this.weatherId,
+    required this.hours,
+    required this.rawItems,
+  });
 
   bool get isRaining {
     return (weatherId >= 200 && weatherId < 400) || (weatherId >= 500 && weatherId < 600);
@@ -82,7 +93,18 @@ class ForecastDay extends Equatable {
 
     final hours = items.map((item) => ForecastHour.fromJson(item)).toList();
 
-    return ForecastDay(dateKey: dateKey, date: parsedDate, tempMax: maxTemp, tempMin: minTemp, condition: weather['main'] as String, conditionDescription: weather['description'] as String, icon: weather['icon'] as String, weatherId: weather['id'] as int, hours: hours, rawItems: items);
+    return ForecastDay(
+      dateKey: dateKey,
+      date: parsedDate,
+      tempMax: maxTemp,
+      tempMin: minTemp,
+      condition: weather['main'] as String,
+      conditionDescription: weather['description'] as String,
+      icon: weather['icon'] as String,
+      weatherId: weather['id'] as int,
+      hours: hours,
+      rawItems: items,
+    );
   }
 
   @override
@@ -96,13 +118,25 @@ class ForecastHour extends Equatable {
   final String icon;
   final int weatherId;
 
-  const ForecastHour({required this.dateTime, required this.temperature, required this.condition, required this.icon, required this.weatherId});
+  const ForecastHour({
+    required this.dateTime,
+    required this.temperature,
+    required this.condition,
+    required this.icon,
+    required this.weatherId,
+  });
 
   factory ForecastHour.fromJson(Map<String, dynamic> json) {
     final weather = json['weather'][0] as Map<String, dynamic>;
     final main = json['main'] as Map<String, dynamic>;
 
-    return ForecastHour(dateTime: DateTime.fromMillisecondsSinceEpoch((json['dt'] as int) * 1000), temperature: (main['temp'] as num).toDouble(), condition: weather['main'] as String, icon: weather['icon'] as String, weatherId: weather['id'] as int);
+    return ForecastHour(
+      dateTime: DateTime.fromMillisecondsSinceEpoch((json['dt'] as int) * 1000),
+      temperature: (main['temp'] as num).toDouble(),
+      condition: weather['main'] as String,
+      icon: weather['icon'] as String,
+      weatherId: weather['id'] as int,
+    );
   }
 
   @override

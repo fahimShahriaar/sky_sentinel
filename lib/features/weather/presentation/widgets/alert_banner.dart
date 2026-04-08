@@ -57,11 +57,11 @@ class AlertBanner extends StatelessWidget {
               ),
             ),
           ),
-          const Icon(
+          /* const Icon(
             Icons.close,
             color: AppColors.textTertiary,
             size: 16,
-          ),
+          ), */
         ],
       ),
     );

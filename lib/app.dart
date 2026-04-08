@@ -222,7 +222,7 @@ class _AppShellState extends State<AppShell> {
           ),
 
           // Notification bell
-          BlocBuilder<LocationBloc, LocationState>(
+          /* BlocBuilder<LocationBloc, LocationState>(
             builder: (context, state) {
               return GestureDetector(
                 onTap: () {
@@ -239,7 +239,7 @@ class _AppShellState extends State<AppShell> {
                 child: const Icon(Icons.notifications_outlined, color: AppColors.textSecondary, size: 22),
               );
             },
-          ),
+          ), */
         ],
       ),
     );

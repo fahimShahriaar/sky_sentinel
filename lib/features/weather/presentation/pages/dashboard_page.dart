@@ -408,7 +408,10 @@ class DashboardPage extends StatelessWidget {
           BlocBuilder<SettingsBloc, SettingsState>(
             builder: (context, settingsState) {
               final isCelsius = settingsState is SettingsLoaded ? settingsState.settings.isCelsius : true;
-              return HourlyOutlookSection(hours: forecast.days.first.hours, isCelsius: isCelsius);
+              return HourlyOutlookSection(
+                hours: forecast.days.first.hours,
+                isCelsius: isCelsius,
+              );
             },
           ),
 
