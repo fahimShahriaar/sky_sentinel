@@ -97,7 +97,10 @@ void callbackDispatcher() {
 
 class BackgroundWorker {
   static Future<void> initialize() async {
-    await Workmanager().initialize(callbackDispatcher);
+    await Workmanager().initialize(
+      callbackDispatcher,
+      isInDebugMode: true,
+    );
     appLogger.i('Background worker initialized');
   }
 

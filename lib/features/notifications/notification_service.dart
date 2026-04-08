@@ -33,10 +33,18 @@ class NotificationService {
       onDidReceiveNotificationResponse: _onNotificationTap,
     );
 
-    // Request permissions on Android 13+
-    await _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
-
     appLogger.i('Notification service initialized');
+  }
+
+  /// Request notification permission on Android 13+.
+  /// Must be called after the Activity is attached (e.g. after first frame).
+  Future<void> requestPermission() async {
+    try {
+      await _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
+      appLogger.i('Notification permission requested');
+    } catch (e) {
+      appLogger.w('Failed to request notification permission: $e');
+    }
   }
 
   static void _onNotificationTap(NotificationResponse response) {

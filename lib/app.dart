@@ -57,6 +57,10 @@ class _AppShellState extends State<AppShell> {
   void initState() {
     super.initState();
     _checkPendingNotification();
+    // Request notification permission after Activity is attached
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      sl<NotificationService>().requestPermission();
+    });
   }
 
   void _checkPendingNotification() {
