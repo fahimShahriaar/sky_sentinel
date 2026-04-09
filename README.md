@@ -11,7 +11,7 @@ A Flutter application that monitors real-time weather conditions for the user's 
 
 ## Architecture & Approach
 
-Sky Sentinel is built using **Clean Architecture** with the **BLoC (Business Logic Component) pattern** and the **Repository pattern**, ensuring a clear separation between the UI, business logic, and data layers.
+Sky Sentinel is built using **Layered Architecture, BLoC Pattern** with the **Clean Architecture** and the **Repository pattern**, ensuring a clear separation between the UI, business logic, and data layers.
 
 ```
 ┌─────────────────────────────┐
