@@ -25,7 +25,9 @@ android {
         applicationId = "com.skysentinel.sky_sentinel"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        // Minimum API 26 (Android 8.0) required for notification channels
+        // and reliable WorkManager + notification behavior.
+        minSdk = 26
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
