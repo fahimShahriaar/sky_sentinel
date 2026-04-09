@@ -3,8 +3,10 @@ class ApiConstants {
 
   static const String baseUrl = 'https://api.openweathermap.org/data/2.5';
 
-  // Provided at build time via: --dart-define=OWM_API_KEY=your_key
-  static const String apiKey = String.fromEnvironment('OWM_API_KEY');
+  static const String apiKey = '96c6f35e1bcacd49136cf060a8f892d7';
+
+  // // Provided at build time via: --dart-define=OWM_API_KEY=your_key
+  // static const String apiKey = String.fromEnvironment('OWM_API_KEY');
 
   static String currentWeather(double lat, double lon) => '$baseUrl/weather?lat=$lat&lon=$lon&appid=$apiKey&units=imperial';
 
