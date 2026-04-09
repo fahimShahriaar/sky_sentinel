@@ -20,9 +20,12 @@ class ForecastModel extends Equatable {
       grouped.putIfAbsent(dayKey, () => []).add(map);
     }
 
-    final days = grouped.entries.map((entry) {
-      return ForecastDay.fromGroup(entry.key, entry.value);
-    }).toList();
+    final days = grouped.entries
+        .map((entry) {
+          return ForecastDay.fromGroup(entry.key, entry.value);
+        })
+        .take(5)
+        .toList();
 
     return ForecastModel(days: days, cityName: cityName);
   }
