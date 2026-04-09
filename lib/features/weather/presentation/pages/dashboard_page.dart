@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/utils/weather_icon_helper.dart';
@@ -32,32 +33,44 @@ class DashboardPage extends StatelessWidget {
           );
         }
       },
-      child: BlocBuilder<WeatherBloc, WeatherState>(
-        builder: (context, weatherState) {
-          return RefreshIndicator(
-            color: AppColors.accentCyan,
-            backgroundColor: AppColors.backgroundCard,
-            onRefresh: () async {
-              final locationState = context.read<LocationBloc>().state;
-              if (locationState is LocationLoaded) {
-                context.read<WeatherBloc>().add(
-                  FetchAllWeatherData(
-                    latitude: locationState.latitude,
-                    longitude: locationState.longitude,
-                  ),
-                );
-              } else {
-                context.read<LocationBloc>().add(
-                  const FetchCurrentLocation(),
-                );
-              }
-              // Wait for state change — notification is triggered
-              // automatically by the BlocListener in AppShell
-              await context.read<WeatherBloc>().stream.firstWhere(
-                (s) => s is WeatherLoaded || s is WeatherError,
+      child: BlocBuilder<LocationBloc, LocationState>(
+        builder: (context, locationState) {
+          // Show location error/permission screens before weather loads
+          if (locationState is LocationPermissionDenied) {
+            return _buildLocationDeniedView(context, locationState.message);
+          }
+          if (locationState is LocationError) {
+            return _buildLocationErrorView(context, locationState.message);
+          }
+
+          return BlocBuilder<WeatherBloc, WeatherState>(
+            builder: (context, weatherState) {
+              return RefreshIndicator(
+                color: AppColors.accentCyan,
+                backgroundColor: AppColors.backgroundCard,
+                onRefresh: () async {
+                  final locState = context.read<LocationBloc>().state;
+                  if (locState is LocationLoaded) {
+                    context.read<WeatherBloc>().add(
+                      FetchAllWeatherData(
+                        latitude: locState.latitude,
+                        longitude: locState.longitude,
+                      ),
+                    );
+                  } else {
+                    context.read<LocationBloc>().add(
+                      const FetchCurrentLocation(),
+                    );
+                  }
+                  // Wait for state change — notification is triggered
+                  // automatically by the BlocListener in AppShell
+                  await context.read<WeatherBloc>().stream.firstWhere(
+                    (s) => s is WeatherLoaded || s is WeatherError,
+                  );
+                },
+                child: _buildContent(context, weatherState),
               );
             },
-            child: _buildContent(context, weatherState),
           );
         },
       ),
@@ -121,6 +134,133 @@ class DashboardPage extends StatelessWidget {
                 const SizedBox(height: 24),
                 const CircularProgressIndicator(color: AppColors.accentCyan),
               ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLocationErrorView(BuildContext context, String message) {
+    final isServiceDisabled = message.toLowerCase().contains('disabled');
+    return CustomScrollView(
+      slivers: [
+        SliverFillRemaining(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.location_off, size: 64, color: AppColors.alertOrange),
+                  const SizedBox(height: 16),
+                  Text(
+                    isServiceDisabled ? 'Location Services Disabled' : 'Location Unavailable',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    message,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                  ),
+                  const SizedBox(height: 24),
+                  if (isServiceDisabled)
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        await Geolocator.openLocationSettings();
+                      },
+                      icon: const Icon(Icons.settings),
+                      label: const Text('Open Location Settings'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.accentCyan,
+                        foregroundColor: AppColors.backgroundDark,
+                      ),
+                    ),
+                  const SizedBox(height: 12),
+                  OutlinedButton.icon(
+                    onPressed: () {
+                      context.read<LocationBloc>().add(const FetchCurrentLocation());
+                    },
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Retry'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.accentCyan,
+                      side: const BorderSide(color: AppColors.accentCyan),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLocationDeniedView(BuildContext context, String message) {
+    final isPermanent = message.toLowerCase().contains('permanently') || message.toLowerCase().contains('settings');
+    return CustomScrollView(
+      slivers: [
+        SliverFillRemaining(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.location_disabled, size: 64, color: AppColors.alertRed),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Location Permission Required',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    isPermanent ? 'Location permission was permanently denied. Please enable it in your device settings to use Sky Sentinel.' : 'Sky Sentinel needs location access to show weather for your area.',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                  ),
+                  const SizedBox(height: 24),
+                  if (isPermanent)
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        await Geolocator.openAppSettings();
+                      },
+                      icon: const Icon(Icons.settings),
+                      label: const Text('Open App Settings'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.accentCyan,
+                        foregroundColor: AppColors.backgroundDark,
+                      ),
+                    )
+                  else
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        context.read<LocationBloc>().add(const FetchCurrentLocation());
+                      },
+                      icon: const Icon(Icons.my_location),
+                      label: const Text('Grant Permission'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.accentCyan,
+                        foregroundColor: AppColors.backgroundDark,
+                      ),
+                    ),
+                  const SizedBox(height: 12),
+                  if (isPermanent)
+                    OutlinedButton.icon(
+                      onPressed: () {
+                        context.read<LocationBloc>().add(const FetchCurrentLocation());
+                      },
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Retry'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.accentCyan,
+                        side: const BorderSide(color: AppColors.accentCyan),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         ),

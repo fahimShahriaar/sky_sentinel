@@ -19,7 +19,7 @@ class AppConstants {
   static const Duration backgroundTaskFrequency = Duration(minutes: 15);
 
   // Default Thresholds
-  static const double defaultTempThreshold = 95.0; // Fahrenheit (stored internally)
+  static const double defaultTempThreshold = 86.0; // Fahrenheit (stored internally)
   static const bool defaultRainAlertEnabled = true;
   static const bool defaultIsCelsius = true;
 

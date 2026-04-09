@@ -303,7 +303,7 @@ class SettingsPage extends StatelessWidget {
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              _buildAboutRow('App', 'Sky Sentinel v1.0.0'),
+              _buildAboutRow('Sky Sentinel', 'v1.0.0'),
               const Divider(color: AppColors.divider, height: 24),
               _buildAboutRow('Data Source', 'OpenWeatherMap API'),
               const Divider(color: AppColors.divider, height: 24),
